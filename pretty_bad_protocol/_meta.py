@@ -111,8 +111,9 @@ class GPGMeta(type):
             identity = this_process.uids
 
         for proc in psutil.process_iter():
-            # In my system proc.name & proc.is_running are methods
-            if (proc.name() == "gpg-agent") and proc.is_running():
+            # Ensure that the process is running and is not a zombie.
+            if (proc.name() == "gpg-agent" and proc.is_running() and
+                    proc.status() != psutil.STATUS_ZOMBIE):
                 log.debug("Found gpg-agent process with pid %d" % proc.pid)
                 if _util._running_windows:
                     if proc.username() == identity:
